@@ -12,6 +12,7 @@ export enum DocumentType {
     MODUL_AJAR = 'modul_ajar',
     LKPD = 'lkpd',
     KISI_KISI = 'kisi_kisi',
+    ASESMEN = 'asesmen',
 }
 
 export class ExportDocumentDto {
@@ -62,6 +63,32 @@ export class GenerateAndExportDto {
     @IsOptional()
     @IsString()
     model?: string;
+
+    @ApiPropertyOptional({ description: 'Tujuan pembelajaran manual' })
+    @IsOptional()
+    tujuan_pembelajaran?: string[];
+
+    @ApiPropertyOptional({ description: 'Capaian pembelajaran manual' })
+    @IsOptional()
+    capaian_pembelajaran?: string[];
+
+    @ApiPropertyOptional({ description: 'Kegiatan pembelajaran manual' })
+    @IsOptional()
+    kegiatan_pembelajaran?: Record<string, string>;
+
+    @ApiPropertyOptional({ description: 'Asesmen manual' })
+    @IsOptional()
+    asesmen?: Record<string, any>;
+
+    @ApiPropertyOptional({ description: 'Materi pokok manual' })
+    @IsOptional()
+    @IsString()
+    materi_pokok?: string;
+
+    @ApiPropertyOptional({ description: 'Metode pembelajaran manual' })
+    @IsOptional()
+    @IsString()
+    metode?: string;
 }
 
 export class ExportResponse {

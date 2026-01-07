@@ -141,17 +141,50 @@ Berikan dalam format JSON.`,
 - Kelas: ${dto.kelas}
 
 Berikan dalam format JSON.`,
+            [DocumentType.ASESMEN]: `Buatkan dokumen Asesmen lengkap untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Topik: ${dto.topik}
+- Kelas: ${dto.kelas}
+- Kurikulum: ${dto.kurikulum || 'Kurikulum Merdeka'}
+
+Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam format JSON.`,
         };
 
         const response = await this.geminiService.chat({
             model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
             messages: [{ role: 'user', content: prompts[dto.document_type] }],
-            systemInstruction: 'Kamu adalah asisten guru profesional Indonesia. Berikan output dalam format JSON yang valid.',
+            systemInstruction: `Kamu adalah asisten guru profesional Indonesia. Buat dokumen dengan SANGAT MENDETAIL, PANJANG, dan PROFESIONAL.
+            Gunakan bahasa akademis yang formatif.
+            Pastikan output SANGAT PANJANG untuk memenuhi kebutuhan halaman yang banyak.
+            Berikan output dalam format JSON yang valid.`,
             responseFormat: { type: 'json_object' },
+            maxTokens: 8192, // Maximize tokens for long content
         });
 
         try {
-            return JSON.parse(response.content);
+            let content = JSON.parse(response.content);
+
+            // Merge manual overrides if present
+            if (dto.document_type === DocumentType.RPP) {
+                if (dto.tujuan_pembelajaran && dto.tujuan_pembelajaran.length > 0) {
+                    content.tujuan_pembelajaran = dto.tujuan_pembelajaran;
+                }
+                if (dto.materi_pokok) {
+                    content.identitas = { ...content.identitas, materi_pokok: dto.materi_pokok };
+                }
+                if (dto.metode) {
+                    content.model_pembelajaran = dto.metode;
+                }
+                if (dto.kegiatan_pembelajaran) {
+                    // Smart merge: Use manual input if available, otherwise keep AI
+                    content.kegiatan_pembelajaran = {
+                        ...content.kegiatan_pembelajaran,
+                        ...dto.kegiatan_pembelajaran
+                    };
+                }
+            }
+
+            return content;
         } catch {
             return { raw_content: response.content };
         }
@@ -201,6 +234,8 @@ Berikan dalam format JSON.`,
      * Add content sections to PDF
      */
     private addContentToPDF(doc: PDFKit.PDFDocument, content: any, level = 0): void {
+        const PAGE_HEIGHT_THRESHOLD = 700; // Trigger new page if close to bottom
+
         if (typeof content === 'string') {
             doc.fontSize(10).font('Helvetica').fillColor('black').text(content, { align: 'justify' });
             doc.moveDown(0.5);
@@ -209,6 +244,7 @@ Berikan dalam format JSON.`,
 
         if (Array.isArray(content)) {
             content.forEach((item, index) => {
+                if (doc.y > PAGE_HEIGHT_THRESHOLD) doc.addPage();
                 if (typeof item === 'string') {
                     doc.fontSize(10).font('Helvetica').fillColor('black').text(`${index + 1}. ${item}`);
                 } else {
@@ -221,8 +257,19 @@ Berikan dalam format JSON.`,
 
         if (typeof content === 'object' && content !== null) {
             Object.entries(content).forEach(([key, value]) => {
+                // Force page break for major sections at root level
+                if (level === 0 && doc.y > 150) { // If not at very top
+                    doc.addPage();
+                } else if (doc.y > PAGE_HEIGHT_THRESHOLD) {
+                    doc.addPage();
+                }
+
                 const title = this.formatSectionTitle(key);
-                doc.fontSize(11).font('Helvetica-Bold').fillColor('black').text(title);
+                doc.fontSize(level === 0 ? 14 : 11) // Larger font for main sections
+                    .font('Helvetica-Bold')
+                    .fillColor('black')
+                    .text(title);
+
                 doc.moveDown(0.3);
                 this.addContentToPDF(doc, value, level + 1);
                 doc.moveDown(0.5);
@@ -378,6 +425,7 @@ Berikan dalam format JSON.`,
             [DocumentType.MODUL_AJAR]: 'modul_ajar',
             [DocumentType.LKPD]: 'lkpd',
             [DocumentType.KISI_KISI]: 'kisi_kisi',
+            [DocumentType.ASESMEN]: 'asesmen',
         };
 
         const { data, error } = await this.supabaseService
@@ -402,6 +450,7 @@ Berikan dalam format JSON.`,
             [DocumentType.MODUL_AJAR]: 'modul_ajar',
             [DocumentType.LKPD]: 'lkpd',
             [DocumentType.KISI_KISI]: 'kisi_kisi',
+            [DocumentType.ASESMEN]: 'asesmen',
         };
 
         await this.supabaseService
@@ -435,6 +484,7 @@ Berikan dalam format JSON.`,
             [DocumentType.MODUL_AJAR]: 'MODUL AJAR',
             [DocumentType.LKPD]: 'LEMBAR KERJA PESERTA DIDIK',
             [DocumentType.KISI_KISI]: 'KISI-KISI SOAL',
+            [DocumentType.ASESMEN]: 'DOKUMEN ASESMEN',
         };
         return titles[type];
     }
