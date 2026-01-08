@@ -191,40 +191,92 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
     }
 
     /**
-     * Generate PDF from document content
+     * Generate PDF from document content with Indonesian Standards
+     * - Margins: Top 3cm, Bottom 2.5cm, Left 3cm, Right 2.5cm
+     * - Font: Times Roman for body, Helvetica Bold for headings
+     * - A4 size (595.28 x 841.89 points)
      */
     private async generatePDF(document: any, type: DocumentType): Promise<Buffer> {
         return new Promise((resolve, reject) => {
-            const doc = new PDFDocument({ margin: 50 });
+            // Indonesian standard margins (in points: 1cm ≈ 28.35pt)
+            const MARGIN_TOP = 85;      // 3 cm (untuk kop surat)
+            const MARGIN_BOTTOM = 71;   // 2.5 cm
+            const MARGIN_LEFT = 85;     // 3 cm
+            const MARGIN_RIGHT = 71;    // 2.5 cm
+
+            const doc = new PDFDocument({
+                size: 'A4',
+                margins: {
+                    top: MARGIN_TOP,
+                    bottom: MARGIN_BOTTOM,
+                    left: MARGIN_LEFT,
+                    right: MARGIN_RIGHT
+                },
+                bufferPages: true // Enable page buffering for page numbers
+            });
             const chunks: Buffer[] = [];
 
             doc.on('data', (chunk) => chunks.push(chunk));
             doc.on('end', () => resolve(Buffer.concat(chunks)));
             doc.on('error', reject);
 
-            // Header
-            doc.fontSize(18).font('Helvetica-Bold').text(this.getDocumentTitle(type), { align: 'center' });
-            doc.moveDown();
+            // School Header Placeholder (if school info provided)
+            if (document.nama_sekolah) {
+                doc.fontSize(12).font('Helvetica-Bold').text(document.nama_sekolah, { align: 'center' });
+                if (document.alamat_sekolah) {
+                    doc.fontSize(10).font('Helvetica').text(document.alamat_sekolah, { align: 'center' });
+                }
+                doc.moveDown(0.5);
+                // Horizontal line under header
+                doc.moveTo(MARGIN_LEFT, doc.y).lineTo(595.28 - MARGIN_RIGHT, doc.y).stroke();
+                doc.moveDown();
+            }
+
+            // Document Type Header
+            doc.fontSize(14).font('Helvetica-Bold').text(this.getDocumentTitle(type), { align: 'center' });
+            doc.moveDown(0.5);
 
             // Document Title
-            doc.fontSize(14).font('Helvetica-Bold').text(document.judul || 'Untitled', { align: 'center' });
+            doc.fontSize(12).font('Helvetica-Bold').text(document.judul || 'Untitled', { align: 'center' });
             doc.moveDown();
 
-            // Identitas
-            doc.fontSize(11).font('Helvetica');
+            // Identitas Section (Times Roman for body)
+            doc.fontSize(11).font('Times-Roman');
             if (document.mapel) doc.text(`Mata Pelajaran: ${document.mapel}`);
             if (document.kelas) doc.text(`Kelas: ${document.kelas}`);
             if (document.kurikulum) doc.text(`Kurikulum: ${document.kurikulum}`);
             if (document.alokasi_waktu) doc.text(`Alokasi Waktu: ${document.alokasi_waktu} menit`);
             doc.moveDown();
 
-            // Content
+            // Main Content
             const content = document.konten_lengkap || document.konten || {};
             this.addContentToPDF(doc, content);
 
-            // Footer
-            doc.moveDown(2);
-            doc.fontSize(9).fillColor('gray').text(`Dibuat: ${new Date().toLocaleDateString('id-ID')}`, { align: 'right' });
+            // Add page numbers to all pages (footer)
+            const range = doc.bufferedPageRange();
+            for (let i = range.start; i < range.start + range.count; i++) {
+                doc.switchToPage(i);
+
+                // Footer with page number
+                const pageText = `Halaman ${i + 1} dari ${range.count}`;
+                doc.fontSize(9)
+                    .font('Helvetica')
+                    .fillColor('gray')
+                    .text(
+                        pageText,
+                        MARGIN_LEFT,
+                        841.89 - MARGIN_BOTTOM + 20, // Position in footer area
+                        { align: 'center', width: 595.28 - MARGIN_LEFT - MARGIN_RIGHT }
+                    );
+
+                // Date on right side of footer
+                doc.text(
+                    `Dibuat: ${new Date().toLocaleDateString('id-ID')}`,
+                    MARGIN_LEFT,
+                    841.89 - MARGIN_BOTTOM + 20,
+                    { align: 'right', width: 595.28 - MARGIN_LEFT - MARGIN_RIGHT }
+                );
+            }
 
             doc.end();
         });

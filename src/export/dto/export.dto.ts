@@ -89,6 +89,16 @@ export class GenerateAndExportDto {
     @IsOptional()
     @IsString()
     metode?: string;
+
+    @ApiPropertyOptional({ description: 'Nama sekolah untuk kop surat' })
+    @IsOptional()
+    @IsString()
+    nama_sekolah?: string;
+
+    @ApiPropertyOptional({ description: 'Alamat sekolah untuk kop surat' })
+    @IsOptional()
+    @IsString()
+    alamat_sekolah?: string;
 }
 
 export class ExportResponse {
