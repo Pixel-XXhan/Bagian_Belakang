@@ -429,6 +429,37 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
     }
 
     /**
+     * Ensure storage bucket exists
+     */
+    private async ensureBucketExists(): Promise<void> {
+        const client = this.supabaseService.getAdminClient();
+
+        // Check if bucket exists
+        const { data: buckets, error: listError } = await client.storage.listBuckets();
+
+        if (listError) {
+            this.logger.warn('Failed to list buckets:', listError.message);
+            return; // Continue anyway, bucket might exist
+        }
+
+        const bucketExists = buckets?.some(b => b.name === this.BUCKET_NAME);
+
+        if (!bucketExists) {
+            this.logger.log(`Creating bucket: ${this.BUCKET_NAME}`);
+            const { error: createError } = await client.storage.createBucket(this.BUCKET_NAME, {
+                public: false,
+                fileSizeLimit: 52428800, // 50MB
+            });
+
+            if (createError && !createError.message.includes('already exists')) {
+                this.logger.warn('Failed to create bucket:', createError.message);
+            } else {
+                this.logger.log(`Bucket ${this.BUCKET_NAME} ready`);
+            }
+        }
+    }
+
+    /**
      * Upload file to Supabase Storage
      */
     private async uploadToStorage(
@@ -437,11 +468,16 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
         buffer: Buffer,
         format: ExportFormat,
     ): Promise<string> {
+        // Ensure bucket exists
+        await this.ensureBucketExists();
+
         const path = `${userId}/${filename}`;
         const contentType = format === ExportFormat.PDF ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-        const { data, error } = await this.supabaseService
-            .getClient()
+        const client = this.supabaseService.getAdminClient();
+
+        // Try upload with upsert
+        const { data, error } = await client
             .storage.from(this.BUCKET_NAME)
             .upload(path, buffer, {
                 contentType,
@@ -449,13 +485,32 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
             });
 
         if (error) {
-            this.logger.error('Failed to upload to storage:', error.message);
-            throw new BadRequestException('Gagal mengupload file ke storage');
+            this.logger.error('Storage upload error:', error.message);
+
+            // If bucket doesn't exist error, try creating and retry once
+            if (error.message.includes('not found') || error.message.includes('does not exist')) {
+                this.logger.log('Retrying with bucket creation...');
+
+                await client.storage.createBucket(this.BUCKET_NAME, {
+                    public: false,
+                    fileSizeLimit: 52428800,
+                });
+
+                const { error: retryError } = await client
+                    .storage.from(this.BUCKET_NAME)
+                    .upload(path, buffer, { contentType, upsert: true });
+
+                if (retryError) {
+                    this.logger.error('Retry failed:', retryError.message);
+                    throw new BadRequestException(`Gagal upload: ${retryError.message}. Pastikan bucket storage sudah dikonfigurasi di Supabase.`);
+                }
+            } else {
+                throw new BadRequestException(`Gagal upload: ${error.message}. Cek konfigurasi Supabase Storage.`);
+            }
         }
 
         // Get signed URL (valid for 1 hour)
-        const { data: signedData, error: signedError } = await this.supabaseService
-            .getClient()
+        const { data: signedData, error: signedError } = await client
             .storage.from(this.BUCKET_NAME)
             .createSignedUrl(path, 3600);
 
