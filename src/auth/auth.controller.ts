@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiHeader, ApiQuery, ApiBearerAuth,
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto, RegisterDto, ResetPasswordDto, UpdatePasswordDto } from './dto/auth.dto';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -13,6 +14,7 @@ export class AuthController {
     ) { }
 
     @Post('login')
+    @Throttle({ default: { limit: 10, ttl: 60000 } }) // Strict limit: 10/min
     @ApiOperation({
         summary: 'Login dengan email dan password',
         description: 'Autentikasi user menggunakan email dan password'
@@ -34,6 +36,7 @@ export class AuthController {
     }
 
     @Post('register')
+    @Throttle({ default: { limit: 10, ttl: 60000 } }) // Strict limit: 10/min
     @ApiOperation({
         summary: 'Register user baru',
         description: 'Mendaftarkan user baru dengan email dan password. Email verifikasi akan dikirim.'
@@ -46,6 +49,7 @@ export class AuthController {
     }
 
     @Post('forgot-password')
+    @Throttle({ default: { limit: 5, ttl: 60000 } }) // Very Strict limit: 5/min
     @ApiOperation({
         summary: 'Kirim email reset password',
         description: 'Mengirim email berisi link untuk reset password'
