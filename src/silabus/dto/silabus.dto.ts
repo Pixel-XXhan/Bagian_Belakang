@@ -54,7 +54,7 @@ export class GenerateSilabusDto {
     @IsString()
     kurikulum?: string;
 
-    @ApiPropertyOptional({ description: 'Model AI', example: 'gemini-2.5-flash' })
+    @ApiPropertyOptional({ description: 'Model AI', example: 'gemini-1.5-flash' })
     @IsOptional()
     @IsString()
     model?: string;

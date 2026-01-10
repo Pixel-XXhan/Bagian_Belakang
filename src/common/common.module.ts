@@ -12,26 +12,35 @@ import { TransformInterceptor } from './interceptors/transform.interceptor';
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        throttlers: [
-          {
-            name: 'short',
-            ttl: 1000,
-            limit: 3,
-          },
-          {
-            name: 'medium',
-            ttl: 10000,
-            limit: 20,
-          },
-          {
-            name: 'long',
-            ttl: 60000,
-            limit: 100,
-          },
-        ],
-        storage: new ThrottlerStorageRedisService(config.get<string>('REDIS_URL') || 'redis://localhost:6379'),
-      }),
+      useFactory: (config: ConfigService) => {
+        const redisUrl = config.get<string>('REDIS_URL');
+        const storage = redisUrl ? new ThrottlerStorageRedisService(redisUrl) : undefined;
+
+        if (!redisUrl) {
+          console.warn('⚠️ REDIS_URL not found. Falling back to In-Memory Rate Limiting.');
+        }
+
+        return {
+          throttlers: [
+            {
+              name: 'short',
+              ttl: 1000,
+              limit: 3,
+            },
+            {
+              name: 'medium',
+              ttl: 10000,
+              limit: 20,
+            },
+            {
+              name: 'long',
+              ttl: 60000,
+              limit: 100,
+            },
+          ],
+          storage: storage, // If undefined, Throttler uses default memory storage
+        };
+      },
     }),
   ],
   providers: [

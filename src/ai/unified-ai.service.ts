@@ -45,7 +45,7 @@ export class UnifiedAiService {
         const geminiDescriptions: Record<string, { desc: string; maxTokens: number; recommended: boolean }> = {
             'gemini-3-pro-preview': { desc: 'Flagship model - Terbaik untuk reasoning kompleks', maxTokens: 65536, recommended: true },
             'gemini-3-flash-preview': { desc: 'Fast model dengan thinking capability', maxTokens: 65536, recommended: false },
-            'gemini-2.5-flash': { desc: 'Efficient model untuk tugas umum', maxTokens: 8192, recommended: false },
+            'gemini-1.5-flash': { desc: 'Efficient model untuk tugas umum', maxTokens: 8192, recommended: true },
             'gemini-2.5-pro': { desc: 'Pro model dengan context window besar', maxTokens: 32768, recommended: false },
         };
 

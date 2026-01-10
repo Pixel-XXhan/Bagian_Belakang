@@ -19,7 +19,7 @@ export class GeminiController {
         schema: {
             example: {
                 models: [
-                    { id: 'gemini-2.5-flash', name: 'gemini-2.5-flash', description: 'Model cepat dan efisien' }
+                    { id: 'gemini-1.5-flash', name: 'gemini-1.5-flash', description: 'Model cepat dan efisien' }
                 ]
             }
         }
@@ -41,7 +41,7 @@ export class GeminiController {
             simple: {
                 summary: 'Simple text chat',
                 value: {
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-1.5-flash',
                     messages: [
                         { role: 'user', content: 'Buatkan RPP untuk Matematika kelas 10' }
                     ],
@@ -51,7 +51,7 @@ export class GeminiController {
             withImage: {
                 summary: 'Chat with image',
                 value: {
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-1.5-flash',
                     messages: [
                         {
                             role: 'user',

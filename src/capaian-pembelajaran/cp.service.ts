@@ -128,7 +128,7 @@ Struktur output:
 - Fase: ${dto.fase} (${faseDescription[dto.fase as keyof typeof faseDescription] || dto.fase})`;
 
         const response = await this.geminiService.chat({
-            model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
+            model: (dto.model || 'gemini-1.5-flash') as any,
             messages: [{ role: 'user', content: prompt }],
             systemInstruction,
             responseFormat: { type: 'json_object' },

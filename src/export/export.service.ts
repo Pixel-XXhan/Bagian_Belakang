@@ -149,10 +149,18 @@ Berikan dalam format JSON.`,
 - Kurikulum: ${dto.kurikulum || 'Kurikulum Merdeka'}
 
 Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam format JSON.`,
+            [DocumentType.BANK_SOAL]: `Buatkan Bank Soal lengkap untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Topik: ${dto.topik}
+- Kelas: ${dto.kelas}
+- Jumlah Soal: ${dto.jumlah_soal || 20}
+- Tingkat Kesulitan: ${dto.tingkat_kesulitan || 'Campuran'}
+
+Sertakan kunci jawaban dan pembahasan. Berikan dalam format JSON.`,
         };
 
         const response = await this.geminiService.chat({
-            model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
+            model: (dto.model || 'gemini-1.5-flash') as any,
             messages: [{ role: 'user', content: prompts[dto.document_type] }],
             systemInstruction: `Kamu adalah asisten guru profesional Indonesia. Buat dokumen dengan SANGAT MENDETAIL, PANJANG, dan PROFESIONAL.
             Gunakan bahasa akademis yang formatif.
@@ -534,6 +542,7 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
             [DocumentType.LKPD]: 'lkpd',
             [DocumentType.KISI_KISI]: 'kisi_kisi',
             [DocumentType.ASESMEN]: 'asesmen',
+            [DocumentType.BANK_SOAL]: 'bank_soal',
         };
 
         const { data, error } = await this.supabaseService
@@ -559,6 +568,7 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
             [DocumentType.LKPD]: 'lkpd',
             [DocumentType.KISI_KISI]: 'kisi_kisi',
             [DocumentType.ASESMEN]: 'asesmen',
+            [DocumentType.BANK_SOAL]: 'bank_soal',
         };
 
         await this.supabaseService
@@ -593,6 +603,7 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
             [DocumentType.LKPD]: 'LEMBAR KERJA PESERTA DIDIK',
             [DocumentType.KISI_KISI]: 'KISI-KISI SOAL',
             [DocumentType.ASESMEN]: 'DOKUMEN ASESMEN',
+            [DocumentType.BANK_SOAL]: 'BANK SOAL',
         };
         return titles[type];
     }

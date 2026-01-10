@@ -104,7 +104,7 @@ export class UserProfileService {
         return data || {
             theme: 'system',
             language: 'id',
-            default_ai_model: 'gemini-2.5-flash',
+            default_ai_model: 'gemini-1.5-flash',
             email_notifications: true,
         };
     }

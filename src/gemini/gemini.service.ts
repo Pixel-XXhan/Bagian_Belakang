@@ -38,10 +38,9 @@ export class GeminiService {
 
     private getModelDescription(model: string): string {
         const descriptions: Record<string, string> = {
-            'gemini-3-pro-preview': 'Model flagship dengan reasoning terbaik',
-            'gemini-3-flash-preview': 'Model cepat dengan thinking capability',
-            'gemini-2.5-flash': 'Model cepat dan efisien untuk berbagai tugas',
-            'gemini-2.5-pro': 'Model pro dengan context window besar',
+            'gemini-2.0-flash-exp': 'Model preview terbaru dengan reasoning',
+            'gemini-1.5-flash': 'Model cepat, efisien, murah',
+            'gemini-1.5-pro': 'Model pro dengan context window besar (2M)',
         };
         return descriptions[model] || 'Gemini Model';
     }
@@ -50,7 +49,7 @@ export class GeminiService {
      * Main chat completion dengan semua fitur
      */
     async chat(dto: GeminiChatDto): Promise<GeminiChatResponse> {
-        const modelName = dto.model || 'gemini-2.5-flash';
+        const modelName = dto.model || 'gemini-1.5-flash';
 
         // Build contents dari messages
         const contents = this.buildContents(dto.messages);
@@ -102,7 +101,7 @@ export class GeminiService {
      * Streaming chat completion
      */
     async *chatStream(dto: GeminiChatDto): AsyncGenerator<string> {
-        const modelName = dto.model || 'gemini-2.5-flash';
+        const modelName = dto.model || 'gemini-1.5-flash';
         const contents = this.buildContents(dto.messages);
 
         const generationConfig: Record<string, any> = {};

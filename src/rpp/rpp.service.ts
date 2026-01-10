@@ -220,7 +220,7 @@ Berikan output dalam format JSON dengan struktur yang lengkap.`;
 
         try {
             const response = await this.geminiService.chat({
-                model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
+                model: (dto.model || 'gemini-1.5-flash') as any,
                 messages: [{ role: 'user', content: prompt }],
                 systemInstruction,
                 responseFormat: { type: 'json_object' },
@@ -287,7 +287,7 @@ Buat RPP yang lengkap dengan format yang terstruktur untuk ditampilkan secara st
 Gunakan format markdown yang rapi dan mudah dibaca.`;
 
         const generator = this.geminiService.chatStream({
-            model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
+            model: (dto.model || 'gemini-1.5-flash') as any,
             messages: [{ role: 'user', content: prompt }],
             systemInstruction,
         });

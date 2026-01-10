@@ -31,7 +31,7 @@ async function bootstrap() {
 #### Gemini
 - \`gemini-3-pro-preview\` - Model flagship
 - \`gemini-3-flash-preview\` - Model cepat dengan thinking
-- \`gemini-2.5-flash\` - Model efisien
+- \`gemini-1.5-flash\` - Model efisien
 - \`gemini-2.5-pro\` - Context window besar
 
 #### OpenRouter

@@ -117,7 +117,7 @@ Format output JSON:
 - Kurikulum: ${kurikulum}`;
 
         const response = await this.geminiService.chat({
-            model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
+            model: (dto.model || 'gemini-1.5-flash') as any,
             messages: [{ role: 'user', content: prompt }],
             systemInstruction,
             responseFormat: { type: 'json_object' },

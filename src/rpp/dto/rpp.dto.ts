@@ -164,7 +164,7 @@ export class GenerateRppDto {
     @IsInt()
     alokasi_waktu?: number;
 
-    @ApiPropertyOptional({ description: 'Model AI yang digunakan', example: 'gemini-2.5-flash' })
+    @ApiPropertyOptional({ description: 'Model AI yang digunakan', example: 'gemini-1.5-flash' })
     @IsOptional()
     @IsString()
     model?: string;

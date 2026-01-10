@@ -11,7 +11,7 @@ export enum AIProvider {
 export const GEMINI_MODELS = [
     'gemini-3-pro-preview',
     'gemini-3-flash-preview',
-    'gemini-2.5-flash',
+    'gemini-1.5-flash',
     'gemini-2.5-pro',
 ] as const;
 
@@ -51,7 +51,7 @@ export class UnifiedChatDto {
     provider?: AIProvider;
 
     @ApiPropertyOptional({
-        description: 'Model ID - Gemini: gemini-3-pro-preview, gemini-2.5-flash, etc. OpenRouter: anthropic/claude-opus-4.5, etc.',
+        description: 'Model ID - Gemini: gemini-3-pro-preview, gemini-1.5-flash, etc. OpenRouter: anthropic/claude-opus-4.5, etc.',
         example: 'gemini-3-pro-preview',
     })
     @IsOptional()

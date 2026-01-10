@@ -125,7 +125,7 @@ Output dalam format JSON.`;
 - Format: ${format}`;
 
         const response = await this.geminiService.chat({
-            model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
+            model: (dto.model || 'gemini-1.5-flash') as any,
             messages: [{ role: 'user', content: prompt }],
             systemInstruction,
             responseFormat: { type: 'json_object' },
@@ -165,7 +165,7 @@ Output dalam format JSON.`;
 - Kelas: ${dto.kelas}`;
 
         const generator = this.geminiService.chatStream({
-            model: (dto.model || 'gemini-2.5-flash') as 'gemini-2.5-flash',
+            model: (dto.model || 'gemini-1.5-flash') as any,
             messages: [{ role: 'user', content: prompt }],
             systemInstruction,
         });

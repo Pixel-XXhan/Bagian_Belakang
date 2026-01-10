@@ -4,10 +4,9 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 // ============== Model Support ==============
 export const GEMINI_MODELS = [
-    'gemini-3-pro-preview',
-    'gemini-3-flash-preview',
-    'gemini-2.5-flash',
-    'gemini-2.5-pro',
+    'gemini-2.0-flash-exp',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro',
 ] as const;
 
 export type GeminiModel = typeof GEMINI_MODELS[number];
@@ -152,7 +151,7 @@ export class ToolDto {
 export class GeminiChatDto {
     @ApiPropertyOptional({
         enum: GEMINI_MODELS,
-        default: 'gemini-2.5-flash',
+        default: 'gemini-1.5-flash',
         description: 'Model yang digunakan'
     })
     @IsOptional()

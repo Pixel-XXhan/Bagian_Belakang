@@ -13,6 +13,7 @@ export enum DocumentType {
     LKPD = 'lkpd',
     KISI_KISI = 'kisi_kisi',
     ASESMEN = 'asesmen',
+    BANK_SOAL = 'bank_soal',
 }
 
 export class ExportDocumentDto {
@@ -50,6 +51,15 @@ export class GenerateAndExportDto {
     @ApiPropertyOptional({ description: 'Alokasi waktu (menit)' })
     @IsOptional()
     alokasi_waktu?: number;
+
+    @ApiPropertyOptional({ description: 'Jumlah soal (untuk Bank Soal)' })
+    @IsOptional()
+    jumlah_soal?: number;
+
+    @ApiPropertyOptional({ description: 'Tingkat kesulitan' })
+    @IsOptional()
+    @IsString()
+    tingkat_kesulitan?: string;
 
     @ApiProperty({ enum: DocumentType, description: 'Tipe dokumen' })
     @IsEnum(DocumentType)
