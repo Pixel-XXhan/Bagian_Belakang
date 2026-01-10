@@ -93,6 +93,7 @@ export class ExportService {
             format: dto.format,
             size: buffer.length,
             expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+            content: content,
         };
     }
 

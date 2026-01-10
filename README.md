@@ -1,127 +1,152 @@
-# RPP Generator API
+# 🔌 Katedra API Service
 
-Backend API untuk aplikasi RPP Generator - Platform AI untuk guru Indonesia.
+> **Otak Cerdas di Balik Katedra AI.**
+> Backend service enterprise-grade yang mentenagai platform edukasi AI Katedra, menangani ribuan request generate dokumen per detik dengan latensi minimal.
 
-## 🚀 Quick Start
-
-```bash
-# Install dependencies
-npm install
-
-# Setup environment
-cp .env.example .env
-# Edit .env dengan kredensial Anda
-
-# Run development server
-npm run start:dev
-
-# Access
-# API: http://localhost:3001
-# Swagger: http://localhost:3001/api/docs
-```
-
-## 📦 Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Framework | NestJS 11 |
-| Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth (JWT) |
-| AI | Google Gemini 2.5 |
-| Storage | Supabase Storage |
-| Docs | Swagger/OpenAPI |
-
-## 📁 Project Structure
-
-```
-src/
-├── auth/                 # Authentication (Supabase OAuth)
-├── gemini/               # Gemini AI integration
-├── openrouter/           # OpenRouter AI (Claude, GPT)
-├── supabase/             # Supabase client
-├── common/               # Guards, filters, decorators
-│
-├── user-profile/         # User management
-├── kurikulum/            # Kurikulum master data
-├── jenjang/              # Jenjang pendidikan
-├── mata-pelajaran/       # Mata pelajaran
-│
-├── capaian-pembelajaran/ # CP Kurikulum Merdeka
-├── atp/                  # Alur Tujuan Pembelajaran
-├── tujuan-pembelajaran/  # Tujuan Pembelajaran
-│
-├── rpp/                  # RPP (+ AI generate + streaming)
-├── silabus/              # Silabus
-├── modul-ajar/           # Modul Ajar
-├── lkpd/                 # Lembar Kerja Peserta Didik
-├── kegiatan/             # Kegiatan Pembelajaran
-│
-├── materi/               # Materi Pembelajaran
-├── media/                # Media Pembelajaran
-├── bahan-ajar/           # Bahan Ajar
-│
-├── bank-soal/            # Bank Soal (+ AI generate)
-├── asesmen/              # Asesmen
-├── kisi-kisi/            # Kisi-Kisi Soal
-├── rubrik/               # Rubrik Penilaian
-│
-└── export/               # Export PDF/DOCX
-```
-
-## 🔧 Environment Variables
-
-Lihat `.env.example` untuk daftar lengkap.
-
-## 📊 API Modules (21 Active)
-
-| Category | Modules |
-|----------|---------|
-| **Core** | Auth, Gemini, OpenRouter |
-| **Master Data** | UserProfile, Kurikulum, Jenjang, MataPelajaran |
-| **Curriculum** | CP, ATP, TujuanPembelajaran |
-| **Documents** | RPP, Silabus, ModulAjar, LKPD, Kegiatan |
-| **Materials** | Materi, Media, BahanAjar |
-| **Assessment** | BankSoal, Asesmen, KisiKisi, Rubrik |
-| **Utility** | Export (PDF/DOCX) |
-
-## 🔐 Authentication
-
-Semua endpoint (kecuali auth) memerlukan JWT token:
-
-```
-Authorization: Bearer <access_token>
-```
-
-## 📚 API Documentation
-
-- **Swagger UI**: `http://localhost:3001/api/docs`
-- **Docs Folder**: `./docs/`
-
-## 🏃 Scripts
-
-```bash
-npm run start:dev    # Development (hot reload)
-npm run build        # Build for production
-npm run start:prod   # Run production
-npm run lint         # Lint code
-npm run format       # Format code
-```
-
-## 📖 Full Documentation
-
-Lihat folder `docs/` untuk dokumentasi lengkap:
-- [Getting Started](./docs/01-getting-started/)
-- [API Reference](./docs/02-api-reference/)
-- [Tutorials](./docs/03-tutorials/)
-- [Architecture](./docs/04-architecture/)
-- [Deployment](./docs/05-deployment/)
-
-## 🔗 Related
-
-- [Supabase](https://supabase.com)
-- [Google AI Studio](https://aistudio.google.com)
-- [NestJS](https://nestjs.com)
+![NestJS](https://img.shields.io/badge/NestJS-11.0-red)
+![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20DB-green)
+![Gemini](https://img.shields.io/badge/AI-Gemini%202.5-blue)
+![OpenRouter](https://img.shields.io/badge/AI-OpenRouter-purple)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ---
 
-Made with ❤️ for Guru Indonesia
+## ⚡ Overview
+
+Backend ini dibangun dengan **NestJS** untuk menjamin skalabilitas dan maintainability jangka panjang. Menggunakan arsitektur modular, service ini menyediakan:
+*   **AI Orchestration**: Manajemen request ke LLM (Gemini, Claude, GPT) dengan load balancing dan failover.
+*   **Streaming Content**: Generasi dokumen real-time (server-sent events) untuk UX yang responsif.
+*   **Robust Auth**: Integrasi aman dengan Supabase Auth (JWT guard, Role-based access).
+*   **Master Data**: Pengelolaan data kurikulum kompleks (CP, ATP, Materi) yang terstruktur.
+
+## 📦 Tech Stack
+
+Kami tidak berkompromi soal kualitas. Stack teknologi yang digunakan adalah standar industri terbaik saat ini:
+
+| Komponen | Teknologi | Alasan Pemilihan |
+|----------|-----------|------------------|
+| **Framework** | [NestJS 11](https://nestjs.com/) | Arsitektur modular, TypeScript-first, Enterprise ready. |
+| **Database** | [Supabase (PostgreSQL)](https://supabase.com/) | Powerful SQL + Realtime capabilities + Auth built-in. |
+| **ORM** | [Prisma](https://www.prisma.io/) | Type-safe database queries. |
+| **AI SDK** | Google Generative AI | Integrasi native dengan model Gemini terbaru. |
+| **Documentation** | Swagger / OpenAPI | Dokumentasi API otomatis dan interaktif. |
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+### Prasyarat
+-   Node.js 20+
+-   PostgreSQL (via Supabase local atau Docker)
+
+### Instalasi
+
+1.  **Clone Repository**
+    ```bash
+    git clone https://github.com/YourUsername/katedra-backend.git
+    cd katedra-backend
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Setup Environment**
+    Copy file contoh dan sesuaikan:
+    ```bash
+    cp .env.example .env
+    ```
+    Isi kredensial Supabase dan AI API Key Anda di `.env`.
+
+4.  **Jalankan Server**
+    ```bash
+    # Development Mode
+    npm run start:dev
+    
+    # Production Mode
+    npm run start:prod
+    ```
+
+5.  **Akses API**
+    *   API Root: `http://localhost:3001`
+    *   Swagger UI: `http://localhost:3001/api/docs`
+
+---
+
+## 📡 API Modules (21 Modules)
+
+Sistem ini memiliki 21 modul aktif yang terorganisir rapi:
+
+### 🧩 Core & AI
+-   `AuthModule`: Authentication strategies.
+-   `GeminiModule`: Wrapper untuk Google Gemini API.
+-   `OpenRouterModule`: Integrasi Claude Opus & GPT-5.
+
+### 📚 Curriculum & Data
+-   `KurikulumModule`: Manajemen Kurikulum Merdeka.
+-   `JenjangModule`: SD, SMP, SMA, SMK.
+-   `MapelModule`: Matematika, Bahasa, Kejuruan.
+-   `CPModule`: Capaian Pembelajaran.
+
+### 📝 Document Generator
+-   `ModulAjarModule`: Generator Modul Ajar lengkap.
+-   `RPPModule`: Rencana Pelaksanaan Pembelajaran.
+-   `SilabusModule`: Silabus semester.
+-   `LKPDModule`: Lembar Kerja Peserta Didik.
+
+### 📊 Assessment
+-   `BankSoalModule`: Generator soal (PG/Essay) + Kunci Jawaban.
+-   `AsesmenModule`: Manajemen nilai.
+-   `RubrikModule`: Kriteria penilaian.
+
+---
+
+## 🧪 Testing
+
+Kami menjunjung tinggi kualitas kode (walaupun unit test masih WIP 😅):
+
+```bash
+# Unit tests
+npm run test
+
+# e2e tests
+npm run test:e2e
+
+# test coverage
+npm run test:cov
+```
+
+---
+
+## 📦 Deployment
+
+Project ini siap deploy kemana saja (Railway, Vercel, VPS) menggunakan Docker:
+
+```bash
+# Build Docker Image
+docker build -t katedra-api .
+
+# Run Container
+docker run -p 3001:3001 --env-file .env katedra-api
+```
+
+---
+
+## 🤝 Kontribusi
+
+Backend Engineer? Pull Request Anda sangat kami nantikan!
+Lihat [CONTRIBUTING.md](CONTRIBUTING.md) untuk pedoman style guide NestJS kami.
+
+---
+
+## 📄 Lisensi
+
+Hak Cipta © 2026 **Katedra AI**.
+Dilisensikan di bawah [MIT License](LICENSE).
+
+---
+
+> *"Code is poetry written by engineers."*
+
+Dibuat dengan ❤️ dan ☕ oleh **Tim Backend Katedra**.

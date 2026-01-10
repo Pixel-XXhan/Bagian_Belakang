@@ -116,4 +116,7 @@ export class ExportResponse {
 
     @ApiProperty({ description: 'Waktu kadaluarsa URL (jika signed URL)' })
     expires_at?: string;
+
+    @ApiPropertyOptional({ description: 'Konten dokumen (untuk preview)' })
+    content?: any;
 }
