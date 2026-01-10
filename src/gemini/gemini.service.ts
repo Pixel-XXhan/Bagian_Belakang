@@ -38,9 +38,10 @@ export class GeminiService {
 
     private getModelDescription(model: string): string {
         const descriptions: Record<string, string> = {
-            'gemini-2.0-flash-exp': 'Model preview terbaru dengan reasoning',
-            'gemini-1.5-flash': 'Model cepat, efisien, murah',
-            'gemini-1.5-pro': 'Model pro dengan context window besar (2M)',
+            'gemini-3-pro-preview': 'Model 3 Pro terbaru (Preview)',
+            'gemini-3-flash-preview': 'Model 3 Flash terbaru (Preview)',
+            'gemini-2.5-flash': 'Model 2.5 Flash yang sangat cepat',
+            'gemini-2.5-pro': 'Model 2.5 Pro dengan kemampuan reasoning',
         };
         return descriptions[model] || 'Gemini Model';
     }

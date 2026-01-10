@@ -14,6 +14,10 @@ export enum DocumentType {
     KISI_KISI = 'kisi_kisi',
     ASESMEN = 'asesmen',
     BANK_SOAL = 'bank_soal',
+    MATERI = 'materi',
+    RUBRIK = 'rubrik',
+    ATP = 'atp',
+    TUJUAN_PEMBELAJARAN = 'tujuan_pembelajaran',
 }
 
 export class ExportDocumentDto {

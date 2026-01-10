@@ -157,6 +157,28 @@ Sertakan rubrik penilaian, instrumen, dan kriteria ketuntasan. Berikan dalam for
 - Tingkat Kesulitan: ${dto.tingkat_kesulitan || 'Campuran'}
 
 Sertakan kunci jawaban dan pembahasan. Berikan dalam format JSON.`,
+            [DocumentType.MATERI]: `Buatkan Ringkasan Materi Lengkap untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Topik: ${dto.topik}
+- Kelas: ${dto.kelas}
+
+Berikan dalam format JSON.`,
+            [DocumentType.RUBRIK]: `Buatkan Rubrik Penilaian Lengkap untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Topik: ${dto.topik}
+- Kelas: ${dto.kelas}
+
+Berikan dalam format JSON.`,
+            [DocumentType.ATP]: `Buatkan Alur Tujuan Pembelajaran (ATP) Lengkap untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Kelas: ${dto.kelas}
+
+Berikan dalam format JSON.`,
+            [DocumentType.TUJUAN_PEMBELAJARAN]: `Buatkan Tujuan Pembelajaran (TP) Lengkap untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Kelas: ${dto.kelas}
+
+Berikan dalam format JSON.`,
         };
 
         const response = await this.geminiService.chat({
@@ -543,6 +565,10 @@ Sertakan kunci jawaban dan pembahasan. Berikan dalam format JSON.`,
             [DocumentType.KISI_KISI]: 'kisi_kisi',
             [DocumentType.ASESMEN]: 'asesmen',
             [DocumentType.BANK_SOAL]: 'bank_soal',
+            [DocumentType.MATERI]: 'materi',
+            [DocumentType.RUBRIK]: 'rubrik',
+            [DocumentType.ATP]: 'atp',
+            [DocumentType.TUJUAN_PEMBELAJARAN]: 'tujuan_pembelajaran',
         };
 
         const { data, error } = await this.supabaseService
@@ -569,6 +595,10 @@ Sertakan kunci jawaban dan pembahasan. Berikan dalam format JSON.`,
             [DocumentType.KISI_KISI]: 'kisi_kisi',
             [DocumentType.ASESMEN]: 'asesmen',
             [DocumentType.BANK_SOAL]: 'bank_soal',
+            [DocumentType.MATERI]: 'materi',
+            [DocumentType.RUBRIK]: 'rubrik',
+            [DocumentType.ATP]: 'atp',
+            [DocumentType.TUJUAN_PEMBELAJARAN]: 'tujuan_pembelajaran',
         };
 
         await this.supabaseService
@@ -604,6 +634,10 @@ Sertakan kunci jawaban dan pembahasan. Berikan dalam format JSON.`,
             [DocumentType.KISI_KISI]: 'KISI-KISI SOAL',
             [DocumentType.ASESMEN]: 'DOKUMEN ASESMEN',
             [DocumentType.BANK_SOAL]: 'BANK SOAL',
+            [DocumentType.MATERI]: 'RINGKASAN MATERI',
+            [DocumentType.RUBRIK]: 'RUBRIK PENILAIAN',
+            [DocumentType.ATP]: 'ALUR TUJUAN PEMBELAJARAN (ATP)',
+            [DocumentType.TUJUAN_PEMBELAJARAN]: 'TUJUAN PEMBELAJARAN (TP)',
         };
         return titles[type];
     }
