@@ -61,8 +61,8 @@ export class ExportService {
      * Generate content with AI and export directly to PDF/DOCX
      */
     async generateAndExport(userId: string, dto: GenerateAndExportDto): Promise<ExportResponse> {
-        // Generate content using AI
-        const content = await this.generateContent(dto);
+        // Use existing content if provided, otherwise generate using AI
+        const content = dto.content ? dto.content : await this.generateContent(dto);
 
         // Create document object
         const document = {

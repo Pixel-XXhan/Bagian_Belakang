@@ -99,6 +99,10 @@ export class GenerateAndExportDto {
     @IsOptional()
     @IsString()
     alamat_sekolah?: string;
+
+    @ApiPropertyOptional({ description: 'Existing content to bypass generation' })
+    @IsOptional()
+    content?: any;
 }
 
 export class ExportResponse {
