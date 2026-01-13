@@ -65,3 +65,62 @@ export class TopicSuggestionsDto {
     @IsString()
     model?: string;
 }
+
+export class TujuanPembelajaranDto {
+    @ApiProperty({ description: 'Mata pelajaran', example: 'Matematika' })
+    @IsString()
+    mapel: string;
+
+    @ApiProperty({ description: 'Topik pembelajaran', example: 'Persamaan Kuadrat' })
+    @IsString()
+    topik: string;
+
+    @ApiProperty({ description: 'Kelas', example: '10' })
+    @IsString()
+    kelas: string;
+
+    @ApiPropertyOptional({ description: 'Kurikulum', example: 'merdeka' })
+    @IsOptional()
+    @IsString()
+    kurikulum?: string;
+
+    @ApiPropertyOptional({ description: 'Model AI' })
+    @IsOptional()
+    @IsString()
+    model?: string;
+}
+
+export class KegiatanPembelajaranDto {
+    @ApiProperty({ description: 'Mata pelajaran', example: 'Matematika' })
+    @IsString()
+    mapel: string;
+
+    @ApiProperty({ description: 'Topik pembelajaran', example: 'Persamaan Kuadrat' })
+    @IsString()
+    topik: string;
+
+    @ApiProperty({ description: 'Kelas', example: '10' })
+    @IsString()
+    kelas: string;
+
+    @ApiPropertyOptional({ description: 'Tujuan pembelajaran' })
+    @IsOptional()
+    @IsString()
+    tujuan?: string;
+
+    @ApiPropertyOptional({ description: 'Durasi dalam menit', example: 80 })
+    @IsOptional()
+    @IsInt()
+    @Type(() => Number)
+    durasi?: number;
+
+    @ApiPropertyOptional({ description: 'Kurikulum', example: 'merdeka' })
+    @IsOptional()
+    @IsString()
+    kurikulum?: string;
+
+    @ApiPropertyOptional({ description: 'Model AI' })
+    @IsOptional()
+    @IsString()
+    model?: string;
+}

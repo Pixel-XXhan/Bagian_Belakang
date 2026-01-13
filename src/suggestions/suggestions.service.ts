@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { GeminiService } from '../gemini/gemini.service';
-import { GetSuggestionsDto, RelatedDocumentsDto, TopicSuggestionsDto } from './dto/suggestions.dto';
+import { GetSuggestionsDto, RelatedDocumentsDto, TopicSuggestionsDto, TujuanPembelajaranDto, KegiatanPembelajaranDto } from './dto/suggestions.dto';
 
 @Injectable()
 export class SuggestionsService {
@@ -11,6 +11,26 @@ export class SuggestionsService {
         private supabaseService: SupabaseService,
         private geminiService: GeminiService,
     ) { }
+
+    /**
+     * Helper to clean AI output - removes common preamble phrases
+     */
+    private cleanAIOutput(content: string): string {
+        const phrasesToRemove = [
+            /^(Tentu,?\s*)?[Bb]erikut\s*(adalah|ini|adalah)?\s*:?\s*/gi,
+            /^(Tentu saja,?\s*)?[Ss]aya\s*akan\s*\w+\s*:?\s*/gi,
+            /^(Baik,?\s*)?[Bb]erikut\s*\w*\s*:?\s*/gi,
+            /^(Oke,?\s*)?[Ii]ni\s*dia\s*:?\s*/gi,
+            /^(Dengan senang hati,?\s*)?/gi,
+            /^\n+/g,
+        ];
+
+        let cleaned = content;
+        for (const pattern of phrasesToRemove) {
+            cleaned = cleaned.replace(pattern, '');
+        }
+        return cleaned.trim();
+    }
 
     async getTopicSuggestions(dto: TopicSuggestionsDto) {
         const systemInstruction = `Kamu adalah ahli kurikulum Indonesia.
@@ -58,6 +78,101 @@ Berikan 5-10 topik yang relevan.`;
             ai_response: { model: response.model, usage: response.usage },
         };
     }
+
+    async getTujuanPembelajaran(dto: TujuanPembelajaranDto) {
+        const systemInstruction = `Kamu adalah ahli kurikulum Indonesia yang berpengalaman menyusun Tujuan Pembelajaran sesuai Kurikulum Merdeka.
+
+ATURAN PENTING:
+- JANGAN awali dengan frasa seperti "Tentu", "Berikut adalah", "Baik", atau pembuka lainnya
+- LANGSUNG berikan tujuan pembelajaran tanpa pengantar
+- Gunakan format numerik (1, 2, 3, dst)
+- Setiap tujuan harus SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
+- Gunakan kata kerja operasional sesuai Taksonomi Bloom
+
+Format output (LANGSUNG tanpa pengantar):
+1. Siswa mampu [kata kerja operasional] [konten] dengan [kriteria keberhasilan]
+2. Siswa dapat [kata kerja operasional] [konten] secara [kondisi]
+...`;
+
+        const prompt = `Buatkan 3-5 Tujuan Pembelajaran untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Topik: ${dto.topik}
+- Kelas: ${dto.kelas}
+- Kurikulum: ${dto.kurikulum || 'Merdeka'}
+
+INGAT: Langsung berikan tujuan pembelajaran tanpa kata pengantar.`;
+
+        const response = await this.geminiService.chat({
+            model: (dto.model || 'gemini-1.5-flash') as any,
+            messages: [{ role: 'user', content: prompt }],
+            systemInstruction,
+        });
+
+        const cleanedContent = this.cleanAIOutput(response.content);
+
+        return {
+            data: {
+                suggestions: cleanedContent.split('\n').filter(line => line.trim()),
+                raw: cleanedContent,
+            },
+            ai_response: { model: response.model, usage: response.usage },
+        };
+    }
+
+    async getKegiatanPembelajaran(dto: KegiatanPembelajaranDto) {
+        const systemInstruction = `Kamu adalah ahli kurikulum Indonesia yang berpengalaman menyusun Kegiatan Pembelajaran sesuai Kurikulum Merdeka.
+
+ATURAN PENTING:
+- JANGAN awali dengan frasa seperti "Tentu", "Berikut adalah", "Baik", atau pembuka lainnya
+- LANGSUNG berikan kegiatan pembelajaran tanpa pengantar
+- Bagi menjadi 3 bagian: Pendahuluan, Inti, Penutup
+- Setiap kegiatan harus detail dan actionable
+
+Format output JSON (LANGSUNG tanpa pengantar):
+{
+  "pendahuluan": ["Guru membuka dengan salam", "Apersepsi: ..."],
+  "inti": ["Siswa mengamati...", "Diskusi kelompok..."],
+  "penutup": ["Refleksi pembelajaran", "Tugas rumah..."]
+}`;
+
+        const prompt = `Buatkan Kegiatan Pembelajaran untuk:
+- Mata Pelajaran: ${dto.mapel}
+- Topik: ${dto.topik}
+- Kelas: ${dto.kelas}
+- Durasi: ${dto.durasi || 80} menit
+${dto.tujuan ? `- Tujuan Pembelajaran: ${dto.tujuan}` : ''}
+
+INGAT: Langsung berikan JSON tanpa kata pengantar.`;
+
+        const response = await this.geminiService.chat({
+            model: (dto.model || 'gemini-1.5-flash') as any,
+            messages: [{ role: 'user', content: prompt }],
+            systemInstruction,
+            responseFormat: { type: 'json_object' },
+        });
+
+        let result: Record<string, any> = {};
+        try {
+            const cleanedContent = this.cleanAIOutput(response.content);
+            result = JSON.parse(cleanedContent);
+        } catch {
+            result = {
+                pendahuluan: [],
+                inti: [],
+                penutup: [],
+                raw: response.content
+            };
+        }
+
+        return {
+            data: {
+                suggestions: result,
+            },
+            ai_response: { model: response.model, usage: response.usage },
+        };
+    }
+
+
 
     async getRelatedDocuments(userId: string, dto: RelatedDocumentsDto) {
         // Get the original document first

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SuggestionsService } from './suggestions.service';
-import { GetSuggestionsDto, RelatedDocumentsDto, TopicSuggestionsDto } from './dto/suggestions.dto';
+import { GetSuggestionsDto, RelatedDocumentsDto, TopicSuggestionsDto, TujuanPembelajaranDto, KegiatanPembelajaranDto } from './dto/suggestions.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { CurrentUserData } from '../common/decorators/current-user.decorator';
@@ -17,6 +17,18 @@ export class SuggestionsController {
     @ApiOperation({ summary: 'Get AI topic suggestions for a subject' })
     async getTopicSuggestions(@Body() dto: TopicSuggestionsDto) {
         return this.suggestionsService.getTopicSuggestions(dto);
+    }
+
+    @Post('tujuan-pembelajaran')
+    @ApiOperation({ summary: 'Get AI suggestions for learning objectives based on topic' })
+    async getTujuanPembelajaran(@Body() dto: TujuanPembelajaranDto) {
+        return this.suggestionsService.getTujuanPembelajaran(dto);
+    }
+
+    @Post('kegiatan-pembelajaran')
+    @ApiOperation({ summary: 'Get AI suggestions for learning activities' })
+    async getKegiatanPembelajaran(@Body() dto: KegiatanPembelajaranDto) {
+        return this.suggestionsService.getKegiatanPembelajaran(dto);
     }
 
     @Post('related')
